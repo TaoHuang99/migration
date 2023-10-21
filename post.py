@@ -3,7 +3,7 @@ import requests
 url = "http://192.168.122.198:8021/container/service_migration/trigger"
 data = {
     "container_name": "piskes",
-    "dstnode": "192.168.0.200"
+    "dstnode": "192.168.122.125"
 }
 
 headers = {
