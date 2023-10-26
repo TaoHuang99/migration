@@ -35,7 +35,7 @@ def _copy_folder_recursive(local_path, target_path, sftp):
             target_item = os.path.join(target_path, item)
             _copy_folder_recursive(local_item, target_item, sftp)
 
-script_path = "/home/ht/piskes_file/docker_run/docker_run.sh"
+script_path = "/home/admin/piskes_file/docker_run/docker_run.sh"
 
 @app.route("/containers/<container_name>/stop", methods=['POST'])
 def stop_container(container_name):
@@ -61,7 +61,7 @@ def start_container(container_name):
         target_host = data['target_host']
         target_username = "admin"
         target_password = "123"
-        target_path = "/home/admin"
+        target_path = "/home/admin/piskes_file"
         local_path = "/home/admin/piskes_file"
         
         success, message = copy_file_to_remote(target_host, target_username, target_password, local_path, target_path)
