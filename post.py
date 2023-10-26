@@ -1,6 +1,6 @@
 import requests
 
-url = "http://192.168.122.198:8021/container/service_migration/trigger"
+url = "http://192.168.122.125:8021/container/service_migration/cmd"
 data = {
     "container_name": "piskes",
     "dstnode": "192.168.122.71"
