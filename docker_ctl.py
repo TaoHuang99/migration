@@ -45,8 +45,9 @@ def start_container(container_name):
         else:
             return jsonify({'error': 'Failed to copy file'}), 500
 
-    except Exception as e:220
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 
 @app.route("/containers/<container_name>/run", methods=['POST'])
