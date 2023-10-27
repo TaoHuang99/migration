@@ -31,26 +31,25 @@ def start_container(container_name):
         
         data = request.get_json()
         if not data or 'KeyServerDomain' not in data:
-            return jsonify({'error': 'Missing KeyServerDomain in request data'}), 500
+            return jsonify({'error': 'Missing KeyServerDomain in request data'}), 400
         
         # 更新config.ini文件
+        config_path = '/home/admin/piskes_file/piskes/config/config.ini'
         config = configparser.ConfigParser()
-        config.read('/home/admin/piskes_file/piskes/config/config.ini')
-        config['addr']['KeyServerDomain'] = data['KeyServerDomain']
-        with open('/home/admin/piskes_file/piskes/config/config.ini', 'w') as configfile:
+        config.read(config_path)
+        
+        # 在值周围添加引号
+        key_server_domain = f'"{data["KeyServerDomain"]}"'
+        config.set('addr', 'KeyServerDomain', key_server_domain)
+        
+        with open(config_path, 'w') as configfile:
             config.write(configfile)
 
-
-
-        return jsonify({'message': 'Configuration updated and container started successfully!'}), 204
+        return jsonify({'message': 'Configuration updated successfully!'}), 200
 
     except Exception as e:
         app.logger.error('Error in start_container: %s', str(e))
         return jsonify({'error': str(e)}), 500
-
-
-
-
 
 @app.route("/containers/<container_name>/run", methods=['POST'])
 def run_script(container_name):
