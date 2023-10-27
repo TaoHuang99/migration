@@ -30,7 +30,7 @@ def start_container(container_name):
         
         data = request.get_json()
         if not data or 'KeyServerDomain' not in data:
-            return jsonify({'error': 'Missing KeyServerDomain in request data'}), 400
+            return jsonify({'error': 'Missing KeyServerDomain in request data'}), 500
         
         # 更新config.ini文件
         config = configparser.ConfigParser()
