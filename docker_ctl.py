@@ -11,31 +11,24 @@ client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 def copy_file_to_remote(target_host, target_username, target_password, local_path, target_path):
     try:
         # 创建SSH客户端
-        app.logger.info("Creating SSH client...")
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(target_host, username=target_username, password=target_password)
         
         # 创建SFTP会话
-        app.logger.info("Opening SFTP session...")
         sftp = ssh.open_sftp()
-        app.logger.info("Copying files...")
         _copy_folder_recursive(local_path, target_path, sftp)
         
         # 设置目标路径的权限
-        app.logger.info("Setting permissions...")
         stdin, stdout, stderr = ssh.exec_command(f"chmod -R 777 {target_path}")
         stderr = stderr.read().decode()
         if stderr:
-            app.logger.error("Failed to set permissions: %s", stderr)
             return False, f"Failed to set permissions on remote path: {stderr}"
         
-        app.logger.info("File copied and permissions set successfully!")
         sftp.close()
         ssh.close()
         return True, "File copied and permissions set successfully!"
     except Exception as e:
-        app.logger.error("Failed to copy file: %s", str(e))
         return False, str(e)
 
 
