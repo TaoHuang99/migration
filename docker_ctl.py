@@ -31,7 +31,7 @@ def start_container(container_name):
         
         data = request.get_json()
         if not data or 'KeyServerDomain' not in data:
-            return jsonify({'error': 'Missing KeyServerDomain in request data'}), 400
+            return jsonify({'error': 'Missing KeyServerDomain in request data'}), 500
         
         # 更新config.ini文件
         config_path = '/home/admin/piskes_file/piskes/config/config.ini'
@@ -45,7 +45,7 @@ def start_container(container_name):
         with open(config_path, 'w') as configfile:
             config.write(configfile)
 
-        return jsonify({'message': 'Configuration updated successfully!'}), 200
+        return jsonify({'message': 'Configuration updated successfully!'}), 204
 
     except Exception as e:
         app.logger.error('Error in start_container: %s', str(e))
