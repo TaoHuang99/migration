@@ -4,6 +4,8 @@ import docker
 import subprocess
 import paramiko
 import os
+path = "/home/admin/piskes_file"
+os.chmod(path, 0o775)
 app = Flask(__name__)
 client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 def copy_file_to_remote(target_host, target_username, target_password, local_path, target_path):
@@ -16,11 +18,19 @@ def copy_file_to_remote(target_host, target_username, target_password, local_pat
         # 创建SFTP会话
         sftp = ssh.open_sftp()
         _copy_folder_recursive(local_path, target_path, sftp)
+        
+        # 设置目标路径的权限
+        stdin, stdout, stderr = ssh.exec_command(f"chmod -R 775 {target_path}")
+        stderr = stderr.read().decode()
+        if stderr:
+            return False, f"Failed to set permissions on remote path: {stderr}"
+        
         sftp.close()
         ssh.close()
-        return True, "File copied successfully!"
+        return True, "File copied and permissions set successfully!"
     except Exception as e:
         return False, str(e)
+
 
 def _copy_folder_recursive(local_path, target_path, sftp):
     if os.path.isfile(local_path):
