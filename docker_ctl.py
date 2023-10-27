@@ -35,7 +35,7 @@ def start_container(container_name):
         # 更新config.ini文件
         config = configparser.ConfigParser()
         config.read('/home/admin/piskes_file/piskes/config/config.ini')
-        config['DEFAULT']['KeyServerDomain'] = data['KeyServerDomain']
+        config['addr']['KeyServerDomain'] = data['KeyServerDomain']
         with open('/home/admin/piskes_file/piskes/config/config.ini', 'w') as configfile:
             config.write(configfile)
 
