@@ -89,20 +89,3 @@ sleep 60
 export ETCDCTL_API=3
 
 
-
-
-# 使用API版本3
-export ETCDCTL_API=3
-
-# 向Etcd写入一个键值对
-docker exec etcd1030 etcdctl --endpoints=http://${CURRENT_IP}:2379 put ${CURRENT_IP} "This is a test value for ${CURRENT_IP}"
-
-# 从NODES里面的其他节点读取
-for NODE_NAME in "${!NODES[@]}"; do
-    NODE_IP=${NODES[$NODE_NAME]}
-    echo "Fetching value for key '${CURRENT_IP}' from $NODE_NAME ($NODE_IP):"
-    docker exec etcd1030 etcdctl --endpoints=http://$NODE_IP:2379 get ${CURRENT_IP}
-    echo "-----------------------------------------"
-done
-
- echo "ETCD cluster build successfully. "
