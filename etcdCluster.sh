@@ -22,14 +22,14 @@ echo "Current node's etcd name: $THIS_NODE"
 
 # 自动发现集群中的其他节点
 declare -A NODES  # 声明关联数组
-START_IP=119  #开始的IP地址
-END_IP=128    #最后的IP地址
+START_IP=2  #开始的IP地址
+END_IP=254    #最后的IP地址
 # 添加当前节点到NODES
 NODES["$THIS_NODE"]=$CURRENT_IP
 
 for i in $(seq $START_IP $END_IP); do
-    if [[ "192.168.0.$i" != "$CURRENT_IP" ]]; then
-        NODE_IP="192.168.0.$i"
+    if [[ "192.168.122.$i" != "$CURRENT_IP" ]]; then
+        NODE_IP="192.168.122.$i"
         ping -c 1 -W 1 $NODE_IP > /dev/null 2>&1
         if [[ $? -eq 0 ]]; then
             NODE_NAME="etcd-$i"
