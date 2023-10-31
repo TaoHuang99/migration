@@ -39,11 +39,6 @@ for i in $(seq $START_IP $END_IP); do
     fi
 done
 
-echo "Active nodes in the cluster:"
-for NODE in "${!NODES[@]}"; do
-    echo "Name: $NODE, IP: ${NODES[$NODE]}"
-done
-
 # 拉取ETCD的Docker镜像
 docker pull quay.io/coreos/etcd:$ETCD_VERSION
 
@@ -54,11 +49,12 @@ for NODE_NAME in "${!NODES[@]}"; do
 done
 INITIAL_CLUSTER=${INITIAL_CLUSTER::-1}  # 移除最后一个逗号
 
-# 检查是否存在名为$THIS_NODE的容器
-if docker ps -a --filter "name=$THIS_NODE" | grep -q "$THIS_NODE"; then
-    echo "Container named $THIS_NODE already exists. Removing..."
-    docker stop $THIS_NODE
-    docker rm -f $THIS_NODE
+
+# 检查是否存在名为etcd1030的容器
+if docker ps -a --filter "name=etcd1030" | grep -q "etcd1030"; then
+    echo "Container named etcd1030 already exists. Removing..."
+    docker stop etcd1030
+    docker rm -f etcd1030
 fi
 
 # 启动ETCD容器
@@ -87,5 +83,4 @@ sleep 60
 
 # 使用API版本3
 export ETCDCTL_API=3
-
 
