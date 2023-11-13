@@ -35,35 +35,17 @@ def start_container(container_name):
         
         # 更新config.ini文件
         config_path = '/home/admin/piskes_file/piskes/config/config.ini'
-        # 读取整个配置文件到内存
-        try:
-            with open(config_path, 'r') as file:
-                config_lines = file.readlines()
-        except IOError as e:
-            return jsonify({'error': str(e)}), 500
+        config = configparser.ConfigParser()
+        config.read(config_path)
         
-        # 更新KeyServerDomain的值，同时保留引号
-        key_server_domain_pattern = re.compile(r'^(\s*KeyServerDomain\s*=\s*")(.*?)(")$', re.IGNORECASE)
-        key_found = False
-        for i, line in enumerate(config_lines):
-            match = key_server_domain_pattern.match(line)
-            if match:
-                # 保留匹配到的前引号和后引号
-                config_lines[i] = f'{match.group(1)}{data["KeyServerDomain"]}{match.group(3)}\n'
-                key_found = True
-                break
+        # 在值周围添加引号
+        key_server_domain = f'"{data["KeyServerDomain"]}"'
+        config.set('addr', 'KeyServerDomain', key_server_domain)
         
-        if not key_found:
-            return jsonify({'error': 'KeyServerDomain not found in the config file'}), 500
-        
-        # 写回配置文件
-        try:
-            with open(config_path, 'w') as file:
-                file.writelines(config_lines)
-        except IOError as e:
-            return jsonify({'error': str(e)}), 500
-        
-        return jsonify({'message': 'KeyServerDomain updated successfully'}), 204
+        with open(config_path, 'w') as configfile:
+            config.write(configfile)
+
+        return jsonify({'message': 'Configuration updated successfully!'}), 204
 
     except Exception as e:
         app.logger.error('Error in start_container: %s', str(e))
