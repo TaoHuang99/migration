@@ -1,0 +1,17 @@
+[Unit]
+Description=Flask Project Service
+After=network.target
+
+[Service]
+User=admin
+Group=admin
+WorkingDirectory=/home/admin/migration
+ExecStart=/usr/bin/python /home/admin/migration/docker_ctl.py
+Restart=on-failure
+# 如果需要环境变量
+# Environment=VARIABLE_NAME=value
+# 或者指定环境变量文件的路径
+# EnvironmentFile=/home/admin/migration/env_vars
+
+[Install]
+WantedBy=multi-user.target
