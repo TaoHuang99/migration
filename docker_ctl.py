@@ -11,7 +11,11 @@ client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 
 
 script_path = "/home/admin/piskes_file/docker_run/docker_run.sh"
-
+class CasePreservingConfigParser(configparser.ConfigParser):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 重写 optionxform 方法，使其返回原始的大小写键名
+        self.optionxform = lambda option: option
 @app.route("/containers/<container_name>/stop", methods=['POST'])
 def stop_container(container_name):
     try:
@@ -25,27 +29,30 @@ def stop_container(container_name):
 def start_container(container_name):
     try:
         container = client.containers.get(container_name)
-        
+
         if container.status == "running":
             return jsonify({'message': f'Container {container_name} is already running!'}), 304
-        
+
         data = request.get_json()
         if not data or 'KeyServerDomain' not in data:
             return jsonify({'error': 'Missing KeyServerDomain in request data'}), 500
         
-        # 更新config.ini文件
         config_path = '/home/admin/piskes_file/piskes/config/config.ini'
-        config = configparser.ConfigParser()
+        config = CasePreservingConfigParser()
         config.read(config_path)
+
+        # 确保 'addr' 部分存在
+        if 'addr' not in config.sections():
+            config.add_section('addr')
         
-        # 在值周围添加引号
-        key_server_domain = f'"{data["KeyServerDomain"]}"'
-        config.set('addr', 'KeyServerDomain', key_server_domain)
-        
+        # 不改变大小写地更新 'KeyServerDomain'
+        config.set('addr', 'KeyServerDomain', f'"{data["KeyServerDomain"]}"')
+
+        # 将修改写回 config 文件
         with open(config_path, 'w') as configfile:
             config.write(configfile)
 
-        return jsonify({'message': 'Configuration updated successfully!'}), 204
+        return jsonify({'message': 'KeyServerDomain updated successfully!'}), 204
 
     except Exception as e:
         app.logger.error('Error in start_container: %s', str(e))
