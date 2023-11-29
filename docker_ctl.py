@@ -51,7 +51,9 @@ def start_container(container_name):
         # 将修改写回 config 文件
         with open(config_path, 'w') as configfile:
             config.write(configfile)
-
+        # 重新启动服务迁移容器，更新配置文件
+        container2 = client.containers.get(ServiceMigration)
+        container2.restart()
         return jsonify({'message': 'KeyServerDomain updated successfully!'}), 204
 
     except Exception as e:
