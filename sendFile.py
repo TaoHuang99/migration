@@ -15,12 +15,14 @@ def remove_remote_folder(ssh_client, folder_path):
 
 def scp_transfer(ssh_client, local_path, remote_path):
     with SCPClient(ssh_client.get_transport()) as scp:
-        # 获取本地文件夹的名称
         folder_name = os.path.basename(local_path.rstrip('/'))
+        remote_folder_path = os.path.join(remote_path, folder_name)
 
-        # 递归复制整个文件夹的内容
-        scp.put(local_path, recursive=True, remote_path=os.path.join(remote_path, folder_name))
+        # 删除远程主机上的现有文件夹
+        remove_remote_folder(ssh_client, remote_folder_path)
 
+        # 递归复制整个文件夹
+        scp.put(local_path, recursive=True, remote_path=remote_folder_path)
 
 # 服务器配置
 server = "192.168.122.26"
