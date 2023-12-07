@@ -10,9 +10,17 @@ def create_ssh_client(server, port, user, password):
     client.connect(server, port, user, password)
     return client
 
+
 def scp_transfer(ssh_client, local_path, remote_path):
     with SCPClient(ssh_client.get_transport()) as scp:
-        scp.put(local_path, recursive=True, remote_path=remote_path)
+        for root, dirs, files in os.walk(local_path):
+            if '.git' in dirs:
+                dirs.remove('.git')  # 排除.git目录
+            for file in files:
+                local_file = os.path.join(root, file)
+                relative_path = os.path.relpath(local_file, local_path)
+                remote_file = os.path.join(remote_path, relative_path)
+                scp.put(local_file, remote_file)
 
 # 服务器配置
 server = "192.168.122.26"
