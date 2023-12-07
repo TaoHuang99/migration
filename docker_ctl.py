@@ -59,11 +59,11 @@ def start_container(container_name):
 
         server = data.get('dstIp')
         port = 22 
-        user = "ht"
+        user = "admin"
         password = "123"
 
         local_folder = f"/home/{current_user}/piskes_file"
-        remote_folder = "/home/ht/"  # 目标路径
+        remote_folder = "/home/admin/"  # 目标路径
 
         ssh_client = create_ssh_client(server, port, user, password)
         scp_transfer(ssh_client, local_folder, remote_folder)
