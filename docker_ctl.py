@@ -53,11 +53,6 @@ def stop_container(container_name):
 @app.route("/containers/<container_name>/start", methods=['POST'])
 def start_container(container_name):
     try:
-        container = client.containers.get(container_name)
-
-        if container.status == "running":
-            return jsonify({'message': f'Container {container_name} is already running!'}), 304
-
         data = request.get_json()
         if not data or 'dstIp' not in data:
             return jsonify({'error': 'Missing dstIp in request data'}), 500
@@ -68,31 +63,58 @@ def start_container(container_name):
         password = "123"
 
         local_folder = f"/home/{current_user}/piskes_file"
-        remote_folder = "/home/admin/"  # 目标路径
+        remote_folder = "/home/ht/"  # 目标路径
 
         ssh_client = create_ssh_client(server, port, user, password)
         scp_transfer(ssh_client, local_folder, remote_folder)
         ssh_client.close()
 
-        # 重新启动服务迁移容器，更新配置文件
-        container2 = client.containers.get(ServiceMigration)
-        container2.restart()
-        return jsonify({'message': 'KeyServerDomain updated successfully!'}), 204
+
+        return jsonify({'message': 'file migration successfully!'}), 204
 
     except Exception as e:
         app.logger.error('Error in start_container: %s', str(e))
         return jsonify({'error': str(e)}), 500
+@app.route("/containers/<container_name>/ask", methods=['POST'])
+def ask_container(container_name):
+    try:
+        container = client.containers.get(container_name)
+
+        if container.status == "running":
+            return jsonify({'message': f'Container {container_name} is already running!'}), 304
+        else:
+            # 处理容器不在运行状态的情况
+            return jsonify({'message': f'Container {container_name} is not running', 'status': container.status}), 200
+
+    except docker.errors.NotFound:
+        # 处理容器不存在的情况
+        return jsonify({'message': f'Container {container_name} not found'}), 200
+    except Exception as e:
+        # 处理其他错误
+        return jsonify({'error': str(e)}), 304
+
 
 @app.route("/containers/<container_name>/run", methods=['POST'])
 def run_script(container_name):
     try:
         subprocess.run(["chmod", "+x", script_path], check=True)
         result = subprocess.run([script_path, container_name], capture_output=True, text=True, check=True)
+
+        try:
+            # 重启容器
+            container2 = client.containers.get("ServiceMigration")
+            container2.restart()
+        except Exception as e:
+            # 如果重启容器失败，记录错误但不影响脚本执行结果
+            app.logger.error('Error restarting container: %s', str(e))
+
         return jsonify({'stdout': result.stdout, 'stderr': result.stderr, 'return_code': result.returncode}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'error': 'Script execution failed', 'stderr': e.stderr, 'return_code': e.returncode}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=3375, debug=False)
