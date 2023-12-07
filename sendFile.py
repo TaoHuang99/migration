@@ -29,7 +29,7 @@ user = "admin"
 password = "123"
 
 # 要复制的本地文件夹和目标路径
-local_folder = f"/home/{current_user}/piskes_file"
+local_folder = f"/home/{current_user}/piskes_file/"
 remote_folder =f"/home/{current_user}"
 
 # 创建SSH客户端并传输文件
