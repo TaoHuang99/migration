@@ -12,10 +12,10 @@ for domain in "${!domain_ip_map[@]}"; do
   ip=${domain_ip_map[$domain]}
 
   # 存储 域名 -> IP地址
-  docker exec -it ETCD etcdctl put $domain $ip
+  docker exec -it etcd1030 etcdctl put $domain $ip
 
   # 存储 IP地址 -> 域名
-  docker exec -it ETCD etcdctl put $ip $domain
+  docker exec -it etcd1030 etcdctl put $ip $domain
 done
 
 
