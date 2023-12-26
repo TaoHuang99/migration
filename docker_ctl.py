@@ -10,8 +10,8 @@ import configparser
 app = Flask(__name__)
 client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 
-current_user = os.getlogin()
-script_path = f"/home/{current_user}/piskes_file/docker_run/docker_run.sh"
+
+script_path = "/home/admin/piskes_file/docker_run/docker_run.sh"
 
 def create_ssh_client(server, port, user, password):
     client = paramiko.SSHClient()
@@ -62,7 +62,7 @@ def start_container(container_name):
         user = "admin"
         password = "123"
 
-        local_folder = f"/home/{current_user}/piskes_file/piskes"
+        local_folder = "/home/admin/piskes_file/piskes"
         remote_folder = "/home/admin/piskes_file/"  # 目标路径
 
         ssh_client = create_ssh_client(server, port, user, password)
